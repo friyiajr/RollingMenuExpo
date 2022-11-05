@@ -46,106 +46,11 @@ const { width } = Dimensions.get("window");
 
 const dotOffset = width / 6;
 
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-
-const Circle: FC<CircleProps> = ({
-  index,
-  color,
-  position,
-  rollButton,
-  isLead,
-  rotation,
-}) => {
-  const defaultSharedValue = useSharedValue(dotOffset * index + 6);
-  const calculatedPosition = useSharedValue(0);
-
-  const style = useAnimatedStyle(() => {
-    calculatedPosition.value = withSpring(position.value, {
-      stiffness: 50,
-      mass: 0.7,
-    });
-
-    const scaleValue =
-      calculatedPosition.value - 3 > defaultSharedValue.value ? 1 : 0;
-
-    const restDisplacementNumber =
-      calculatedPosition.value - 3 > defaultSharedValue.value ? 1 : 20;
-
-    if (isLead && calculatedPosition.value <= 10) {
-      rotation!.value = 0;
-    } else if (isLead) {
-      rotation!.value = Math.PI * (calculatedPosition.value / width) * 1.5;
-    }
-
-    return {
-      position: "absolute",
-      width: 52,
-      height: 52,
-      borderRadius: 26,
-      backgroundColor: color,
-      zIndex: isLead ? 10 : 1,
-      left: isLead ? undefined : defaultSharedValue.value,
-      justifyContent: "center",
-      alignItems: "center",
-      transform: [
-        {
-          scale: isLead
-            ? 1
-            : withSpring(scaleValue, {
-                mass: 0.5,
-                restDisplacementThreshold: restDisplacementNumber,
-              }),
-        },
-        {
-          translateX: isLead
-            ? withSpring(position.value, {
-                stiffness: 50,
-                mass: 0.7,
-              })
-            : 1,
-        },
-        {
-          rotate: isLead ? withSpring(`${rotation!.value}rad`) : `${0}rad`,
-        },
-      ],
-    };
-  });
-
-  return (
-    <AnimatedPressable
-      style={style}
-      onPress={() => {
-        isLead || calculatedPosition.value >= 10 ? rollButton?.() : undefined;
-      }}
-    >
-      <View style={styles.buttonContent}>
-        {isLead ? (
-          <Text style={styles.plusButton}>+</Text>
-        ) : (
-          <Image
-            source={images[index]}
-            style={styles.buttonImage}
-            resizeMode="contain"
-          />
-        )}
-      </View>
-    </AnimatedPressable>
-  );
+const Circle: FC<CircleProps> = ({ color }) => {
+  return <View style={{ backgroundColor: color, height: 50, width: 50 }} />;
 };
 
 export default function App() {
-  const position = useSharedValue(3);
-  const rotation = useSharedValue(Math.PI);
-
-  const rollButton = () => {
-    "worklet";
-    if (position.value === dotOffset * 5 + 3) {
-      position.value = 6;
-    } else {
-      position.value = dotOffset * 5 + 3;
-    }
-  };
-
   const showMessage = (message: string) => {
     "worklet";
     alert(message);
@@ -155,44 +60,7 @@ export default function App() {
     <SafeAreaView style={styles.container}>
       <View style={styles.container} />
       <View style={styles.menuContainer}>
-        <Circle
-          index={0}
-          color={colors[0]}
-          position={position}
-          rollButton={rollButton}
-          rotation={rotation}
-          isLead
-        />
-        <Circle
-          index={1}
-          color={colors[1]}
-          position={position}
-          rollButton={() => showMessage("One")}
-        />
-        <Circle
-          index={2}
-          color={colors[2]}
-          position={position}
-          rollButton={() => showMessage("Two")}
-        />
-        <Circle
-          index={3}
-          color={colors[3]}
-          position={position}
-          rollButton={() => showMessage("Three")}
-        />
-        <Circle
-          index={4}
-          color={colors[4]}
-          position={position}
-          rollButton={() => showMessage("Four")}
-        />
-        <Circle
-          index={0}
-          color={colors[5]}
-          position={position}
-          rollButton={() => showMessage("Five")}
-        />
+        <Circle color={colors[0]} />
       </View>
     </SafeAreaView>
   );
